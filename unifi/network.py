@@ -1,5 +1,7 @@
 """ Network module contains classes for different Unifi network types
 """
+from ipaddress import ip_address, ip_network
+
 class Network(dict):
     """ Generic network resource. This base class sets baseline properties
         and is inherited by the other network types. This class should not
@@ -15,13 +17,11 @@ class Network(dict):
     def __init__(self, params):
         """ Returns a generic network resource.
         """
-        dict.__init__(
-            self,
-            _id=params['_id'],
-            name=params['name'],
-            site_id=params['site_id'],
-            purpose=params['purpose'],
-        )
+        super(Network, self).__init__(params)
+        self._id = params['_id']
+        self.name = params['name']
+        self.site_id = params['site_id']
+        self.purpose = params['purpose']
 
     def __repr__(self):
         return "%s(name='%s', purpose='%s')" % (
@@ -37,11 +37,9 @@ class WAN(Network):
         """ Returns a WAN network resource.
         """
         super().__init__(params)
-        self.update(
-            wan_ip=params['wan_ip'],
-            wan_networkgroup=params['wan_networkgroup'],
-            wan_type=params['wan_type'],
-        )
+        self.wan_ip = ip_address(params['wan_ip'])
+        self.wan_networkgroup = params['wan_networkgroup']
+        self.wan_type = params['wan_type']
 
 class Corporate(Network):
     """ Corporate network resource that has properties for basic LAN
@@ -51,9 +49,31 @@ class Corporate(Network):
         """ Returns a corporate network resource.
         """
         super().__init__(params)
-        self.update(
-            vlan_enabled=params['vlan_enabled'],
-        )
+        valid_params = [
+            'ip_subnet',
+            'ipv6_interface_type',
+            'domain_name',
+            'is_nat',
+            'dhcpd_enabled',
+            'dhcpd_start',
+            'dhcpd_stop',
+            'dhcpdv6_enabled',
+            'ipv6_ra_enabled',
+            'networkgroup',
+            'upnp_lan_enabled',
+            'dhcpguard_enabled',
+            'dhcp_relay_enabled',
+            'igmp_snooping',
+            'dhcpd_unifi_controller',
+            'dhcpd_leasetime',
+            'dhcpd_gateway_enabled',
+            'dhcpd_dns_enabled',
+        ]
+        for key in valid_params:
+            if key in params:
+                setattr(self, key, params[key])
+            else:
+                setattr(self, key, None)
 
 class SiteVPN(Network):
     """ SiteVPN resource that has properties for VPN connections.
