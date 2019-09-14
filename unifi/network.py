@@ -1,3 +1,4 @@
+# pylint: disable=E1101
 """ Network module contains classes for different Unifi network types
 """
 from ipaddress import ip_address, ip_network
@@ -69,11 +70,24 @@ class Corporate(Network):
             'dhcpd_gateway_enabled',
             'dhcpd_dns_enabled',
         ]
+
         for key in valid_params:
             if key in params:
                 setattr(self, key, params[key])
             else:
                 setattr(self, key, None)
+
+    @property
+    def gateway(self):
+        """ Returns IPv4Address object representing the gateway address.
+        """
+        return ip_address(self.ip_subnet.split('/')[0])
+
+    @property
+    def network(self):
+        """ Returns IPv4Network object representing the network.
+        """
+        return ip_network(self.ip_subnet, False)
 
 class SiteVPN(Network):
     """ SiteVPN resource that has properties for VPN connections.
@@ -83,8 +97,25 @@ class SiteVPN(Network):
         """ Returns a site vpn network resource.
         """
         super().__init__(params)
-        self.update(
-            enabled=params['enabled'],
-            ifname=params['ifname'],
-            vpn_type=params['vpn_type'],
-        )
+        valid_params = [
+            'route_distance',
+            'ipsec_profile',
+            'remote_vpn_subnets',
+            'ipsec_key_exchange',
+            'ipsec_encryption',
+            'ipsec_hash',
+            'ipsec_dh_group',
+            'ipsec_pfs',
+            'ipsec_dynamic_routing',
+            'ipsec_peer_ip',
+            'ipsec_local_ip',
+            'x_ipsec_pre_shared_key',
+            'is_nat',
+            'ifname',
+        ]
+
+        for key in valid_params:
+            if key in params:
+                setattr(self, key, params[key])
+            else:
+                setattr(self, key, None)
