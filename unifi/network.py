@@ -1,4 +1,6 @@
-class Network:
+""" Network module contains classes for different Unifi network types
+"""
+class Network(dict):
     """ Generic network resource. This base class sets baseline properties
         and is inherited by the other network types. This class should not
         be directly instantiated. See TYPES constant for available network
@@ -13,16 +15,19 @@ class Network:
     def __init__(self, params):
         """ Returns a generic network resource.
         """
-        self._id = params['_id']
-        self.name = params['name']
-        self.site_id = params['site_id']
-        self.purpose = params['purpose']
+        dict.__init__(
+            self,
+            _id=params['_id'],
+            name=params['name'],
+            site_id=params['site_id'],
+            purpose=params['purpose'],
+        )
 
     def __repr__(self):
         return "%s(name='%s', purpose='%s')" % (
             type(self).__name__,
-            self.name,
-            self.purpose,
+            self['name'],
+            self['purpose'],
         )
 
 class WAN(Network):
@@ -32,9 +37,11 @@ class WAN(Network):
         """ Returns a WAN network resource.
         """
         super().__init__(params)
-        self.wan_ip = params['wan_ip']
-        self.wan_networkgroup = params['wan_networkgroup']
-        self.wan_type = params['wan_type']
+        self.update(
+            wan_ip=params['wan_ip'],
+            wan_networkgroup=params['wan_networkgroup'],
+            wan_type=params['wan_type'],
+        )
 
 class Corporate(Network):
     """ Corporate network resource that has properties for basic LAN
@@ -44,7 +51,9 @@ class Corporate(Network):
         """ Returns a corporate network resource.
         """
         super().__init__(params)
-        self.vlan_enabled = params['vlan_enabled']
+        self.update(
+            vlan_enabled=params['vlan_enabled'],
+        )
 
 class SiteVPN(Network):
     """ SiteVPN resource that has properties for VPN connections.
@@ -54,6 +63,8 @@ class SiteVPN(Network):
         """ Returns a site vpn network resource.
         """
         super().__init__(params)
-        self.enabled = params['enabled']
-        self.ifname = params['ifname']
-        self.vpn_type = params['vpn_type']
+        self.update(
+            enabled=params['enabled'],
+            ifname=params['ifname'],
+            vpn_type=params['vpn_type'],
+        )

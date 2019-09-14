@@ -1,5 +1,4 @@
 import requests
-import json
 import urllib3
 
 import unifi
@@ -44,17 +43,17 @@ class Client:
         """
         url = "{}/api/login".format(self.controller)
         try:
-            r = self.session.post(url, json=self.credentials, verify=self.verify_ssl)
+            req = self.session.post(url, json=self.credentials, verify=self.verify_ssl)
         except:
             return False
-        return r.json()
+        return req.json()
 
     # Sites
     def get_sites(self):
         """ Returns a collection of sites from the API.
         """
         url = "{}/api/self/sites".format(self.controller)
-        return ( Site(site) for site in self.session.get(url).json()['data'] )
+        return (Site(site) for site in self.session.get(url).json()['data'])
 
     # System
     def get_system(self):
@@ -83,7 +82,6 @@ class Client:
             raise ApiError(net)
         if not net.json()['data']: # API returns empty data when no resource exists
             raise Error("network object {} not found".format(_id))
-            return False
         net = net.json()['data'][0]
         _class = getattr(unifi.network, Network.TYPES[net['purpose']])
         return _class(net)
@@ -91,16 +89,13 @@ class Client:
     def delete_network(self, _id):
         """ Delete a network resource from the API.
         """
-        try:
-            self.get_network(_id)
-            url = "{}/api/s/default/rest/networkconf/{}".format(self.controller, _id)
-            headers = { 'X-Csrf-Token': self.session.cookies['csrf_token']}
-            net = self.session.delete(url, headers=headers)
-            if net.status_code > 399:
-                print(net.status_code)
-                raise ApiError(net)
-        except:
-            raise
+        self.get_network(_id)
+        url = "{}/api/s/default/rest/networkconf/{}".format(self.controller, _id)
+        headers = {'X-Csrf-Token': self.session.cookies['csrf_token']}
+        net = self.session.delete(url, headers=headers)
+        if net.status_code > 399:
+            print(net.status_code)
+            raise ApiError(net)
         return True
 
     # Set Unifi Controller
@@ -113,4 +108,3 @@ class Client:
         hostname, port, ssl = value
         scheme = 'https://' if ssl else 'http://'
         self._controller = "{}{}:{}".format(scheme, hostname, port)
-
