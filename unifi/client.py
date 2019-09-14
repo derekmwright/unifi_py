@@ -53,7 +53,7 @@ class Client:
         """ Returns a collection of sites from the API.
         """
         url = "{}/api/self/sites".format(self.controller)
-        return (Site(site) for site in self.session.get(url).json()['data'])
+        return [Site(site) for site in self.session.get(url).json()['data']]
 
     # System
     def get_system(self):
@@ -68,9 +68,7 @@ class Client:
         """
         url = "{}/api/s/default/rest/networkconf".format(self.controller)
         nets = self.session.get(url).json()['data']
-        for net in nets:
-            _class = getattr(unifi.network, Network.TYPES[net['purpose']])
-            yield _class(net)
+        return [ getattr(unifi.network, Network.TYPES[net['purpose']])(net) for net in nets ]
 
     def get_network(self, _id):
         """ Returns a network resource from the API.
