@@ -68,7 +68,7 @@ class Client:
         """
         url = "{}/api/s/default/rest/networkconf".format(self.controller)
         nets = self.session.get(url).json()['data']
-        return [ getattr(unifi.network, Network.TYPES[net['purpose']])(net) for net in nets ]
+        return [getattr(unifi.network, Network.TYPES[net['purpose']])(net) for net in nets]
 
     def get_network(self, _id):
         """ Returns a network resource from the API.
