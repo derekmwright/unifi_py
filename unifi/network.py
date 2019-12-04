@@ -38,7 +38,7 @@ class WAN(Network):
     def __init__(self, params):
         """ Returns a WAN network resource.
         """
-        super().__init__(params)
+        super(WAN, self).__init__(params)
         self.wan_ip = ip_address(params['wan_ip'])
         self.wan_networkgroup = params['wan_networkgroup']
         self.wan_type = params['wan_type']
@@ -50,7 +50,7 @@ class Corporate(Network):
     def __init__(self, params):
         """ Returns a corporate network resource.
         """
-        super().__init__(params)
+        super(Corporate, self).__init__(params)
         valid_params = [
             'ip_subnet',
             'ipv6_interface_type',
@@ -97,7 +97,7 @@ class SiteVPN(Network):
     def __init__(self, params):
         """ Returns a site vpn network resource.
         """
-        super().__init__(params)
+        super(SiteVPN, self).__init__(params)
         valid_params = [
             'route_distance',
             'ipsec_profile',
