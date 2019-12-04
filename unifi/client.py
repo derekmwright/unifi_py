@@ -67,12 +67,15 @@ class Client:
         url = "{}/api/self/sites".format(self.controller)
         return [Site(site) for site in self.session.get(url).json()['data']]
 
+    def get_site(self, name):
+        return list(filter(lambda site: site.name == name, self.get_sites()))[0]
+
     # System
-    def get_system(self):
+    def get_system(self, site):
         """ Returns system properties from the API.
         """
-        url = "{}/api/s/"
-        return self.session.get(url).json()['data']
+        url = "{}/api/s/{}/stat/sysinfo".format(self.controller, site.name)
+        return self.session.get(url).json()['data'][0]
 
 
     # Networks
