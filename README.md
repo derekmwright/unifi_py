@@ -17,4 +17,11 @@ print(client.get_sites())
 
 # Get Networks
 print(client.get_networks())
+
+# Get sysinfo for all sites
+print(list(map(lambda site: client.get_system(site), client.get_sites())))
+
+# Get sysinfo for a single site
+site = client.get_site('default')
+print(client.get_system(site))
 ```
