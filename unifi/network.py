@@ -80,11 +80,6 @@ class Corporate(Network):
         ]
 
         self.__validate_params(params)
-        for key in valid_params:
-            if key in params:
-                setattr(self, key, params[key])
-            else:
-                setattr(self, key, None)
 
     @property
     def gateway(self):
