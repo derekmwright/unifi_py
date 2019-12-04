@@ -72,15 +72,20 @@ class Client:
         klass = getattr(__import__('unifi'), 'network')
         return getattr(klass, name)
 
+    #
+    # Shortcut methods to provide some convenience through the client object.
+    #
+
     # Sites
     def get_sites(self):
-        """ Returns a collection of sites from the API.
+        """ Returns a collection of sites from the API. Shortcut method for unifi.Site.find_all
         """
-        url = "{}/api/self/sites".format(self.controller)
-        return [Site(site) for site in self.session.get(url).json()['data']]
+        return Site.find_all(self)
 
     def get_site(self, name):
-        return list(filter(lambda site: site.name == name, self.get_sites()))[0]
+        """ Returns a site from the API. Shortcut method for unifi.Site.find_by
+        """
+        return Site.find_by(self, name, 'name')
 
     # System
     def get_system(self, site):
@@ -91,14 +96,14 @@ class Client:
 
     # Settings
     def get_settings(self, site):
-        url = "{}/api/s/{}/get/setting".format(self.controller, site.name)
-        return self.session.get(url).json()['data']
+        """ Returns an object that contains all setting sections.
+        """
+        return Settings(self, site)
 
-    def get_setting(self, site, key):
-        if key in self.setting_keys:
-            url = "{}/api/s/{}/get/setting/{}".format(self.controller, site.name, key)
-            return self.session.get(url).json()['data'][0]
-        raise ApiError('Invalid Setting Key')
+    def get_settings_section(self, site, key):
+        """ Returns an object that contains a single setting section.
+        """
+        return Settings(self, site, key)
 
     # Networks
     def get_networks(self):
