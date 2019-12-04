@@ -7,6 +7,7 @@ import urllib3
 from unifi.error import Error
 from unifi.error import ApiError
 from unifi.site import Site
+from unifi.settings import Settings
 from unifi.network import Network
 
 class Client:
@@ -55,6 +56,17 @@ class Client:
             raise ApiError(req)
         return req.json()
 
+    def get_api_resource(self, suffix):
+        """ Do a generic call to the API, must provide the url suffix
+            for data you are expecting. Returns a list containing the
+            resulting data.
+        """
+        url = "{}/api/{}".format(self.controller, suffix)
+        req = self.session.get(url).json()
+        if req['meta']['rc'] == 'ok':
+            return req['data']
+        raise ApiError(req['meta']['msg'])
+
     @staticmethod
     def __get_class(name):
         klass = getattr(__import__('unifi'), 'network')
@@ -77,6 +89,16 @@ class Client:
         url = "{}/api/s/{}/stat/sysinfo".format(self.controller, site.name)
         return self.session.get(url).json()['data'][0]
 
+    # Settings
+    def get_settings(self, site):
+        url = "{}/api/s/{}/get/setting".format(self.controller, site.name)
+        return self.session.get(url).json()['data']
+
+    def get_setting(self, site, key):
+        if key in self.setting_keys:
+            url = "{}/api/s/{}/get/setting/{}".format(self.controller, site.name, key)
+            return self.session.get(url).json()['data'][0]
+        raise ApiError('Invalid Setting Key')
 
     # Networks
     def get_networks(self):
