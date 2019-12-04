@@ -32,6 +32,13 @@ class Network(dict):
             self['purpose'],
         )
 
+    def __validate_params(self):
+        for key in self._valid_params:
+            if key in params:
+                setattr(self, key, params[key])
+            else:
+                setattr(self, key, None)
+
 class WAN(Network):
     """ WAN resource that has properties for wan connection settings.
     """
@@ -51,7 +58,7 @@ class Corporate(Network):
         """ Returns a corporate network resource.
         """
         super(Corporate, self).__init__(params)
-        valid_params = [
+        self._valid_params = [
             'ip_subnet',
             'ipv6_interface_type',
             'domain_name',
@@ -72,11 +79,7 @@ class Corporate(Network):
             'dhcpd_dns_enabled',
         ]
 
-        for key in valid_params:
-            if key in params:
-                setattr(self, key, params[key])
-            else:
-                setattr(self, key, None)
+        self.__validate_params()
 
     @property
     def gateway(self):
@@ -98,7 +101,7 @@ class SiteVPN(Network):
         """ Returns a site vpn network resource.
         """
         super(SiteVPN, self).__init__(params)
-        valid_params = [
+        self._valid_params = [
             'route_distance',
             'ipsec_profile',
             'remote_vpn_subnets',
@@ -115,8 +118,4 @@ class SiteVPN(Network):
             'ifname',
         ]
 
-        for key in valid_params:
-            if key in params:
-                setattr(self, key, params[key])
-            else:
-                setattr(self, key, None)
+        self.__validate_params()
