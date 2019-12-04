@@ -32,7 +32,7 @@ class Network(dict):
             self['purpose'],
         )
 
-    def __validate_params(self):
+    def __validate_params(self, params):
         for key in self._valid_params:
             if key in params:
                 setattr(self, key, params[key])
@@ -79,7 +79,12 @@ class Corporate(Network):
             'dhcpd_dns_enabled',
         ]
 
-        self.__validate_params()
+        self.__validate_params(params)
+        for key in valid_params:
+            if key in params:
+                setattr(self, key, params[key])
+            else:
+                setattr(self, key, None)
 
     @property
     def gateway(self):
@@ -118,4 +123,4 @@ class SiteVPN(Network):
             'ifname',
         ]
 
-        self.__validate_params()
+        self.__validate_params(params)
