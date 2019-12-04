@@ -4,7 +4,6 @@
 import requests
 import urllib3
 
-import unifi
 from unifi.error import Error
 from unifi.error import ApiError
 from unifi.site import Site
@@ -56,6 +55,11 @@ class Client:
             raise ApiError(req)
         return req.json()
 
+    @staticmethod
+    def __get_class(name):
+        klass = getattr(__import__('unifi'), 'network')
+        return getattr(klass, name)
+
     # Sites
     def get_sites(self):
         """ Returns a collection of sites from the API.
@@ -68,6 +72,7 @@ class Client:
         """ Returns system properties from the API.
         """
         url = "{}/api/s/"
+        return self.session.get(url).json()['data']
 
 
     # Networks
@@ -76,7 +81,7 @@ class Client:
         """
         url = "{}/api/s/default/rest/networkconf".format(self.controller)
         nets = self.session.get(url).json()['data']
-        return [getattr(unifi.network, Network.TYPES[net['purpose']])(net) for net in nets]
+        return [self.__get_class(Network.TYPES[net['purpose']])(net) for net in nets]
 
     def get_network(self, _id):
         """ Returns a network resource from the API.
@@ -89,8 +94,7 @@ class Client:
         if not net.json()['data']: # API returns empty data when no resource exists
             raise Error("network object {} not found".format(_id))
         net = net.json()['data'][0]
-        _class = getattr(unifi.network, Network.TYPES[net['purpose']])
-        return _class(net)
+        return self.__get_class(Network.TYPES[net['purpose']])(net)
 
     def delete_network(self, _id):
         """ Delete a network resource from the API.

@@ -9,6 +9,7 @@ class Network(dict):
         be directly instantiated. See TYPES constant for available network
         types that inherit from this class.
     """
+
     TYPES = {
         'wan': 'WAN',
         'corporate': 'Corporate',
