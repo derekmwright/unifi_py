@@ -1,4 +1,5 @@
 test.py
+venv
 *.pyc
 */*.pyc
 __pycache__
